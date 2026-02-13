@@ -103,7 +103,31 @@ class TestSignup:
         assert response.status_code == 404
         assert "not found" in response.json()["detail"].lower()
 
+    def test_signup_rejected_when_activity_full(self, client):
+        # Fetch current activity state to determine capacity and current participants
+        get_response = client.get("/activities")
+        assert get_response.status_code == 200
+        activity = get_response.json()["Soccer Team"]
+        max_participants = activity["max_participants"]
+        current_participants = list(activity["participants"])
 
+        # Fill remaining slots with unique test emails
+        remaining_slots = max_participants - len(current_participants)
+        for i in range(remaining_slots):
+            email = f"capacity_fill_{i}@mergington.edu"
+            signup_response = client.post(
+                f"/activities/Soccer Team/signup?email={email}"
+            )
+            assert signup_response.status_code == 200
+
+        # Attempt one more signup beyond capacity and expect rejection
+        overflow_email = "overflow_capacity@mergington.edu"
+        overflow_response = client.post(
+            f"/activities/Soccer Team/signup?email={overflow_email}"
+        )
+        assert overflow_response.status_code == 400
+        detail = overflow_response.json().get("detail", "").lower()
+        assert "full" in detail or "capacity" in detail
 # ──────────────────────────────────────────────
 # DELETE /activities/{activity_name}/unregister
 # ──────────────────────────────────────────────
