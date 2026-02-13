@@ -27,12 +27,9 @@ _original_activities = copy.deepcopy(_activities_store)
 
 @pytest.fixture(autouse=True)
 def reset_activities():
-    """Reset the in-memory activities database before each test."""
-    # Restore original state
-    _activities_store.clear()
-    _activities_store.update(copy.deepcopy(_original_activities))
+    """Reset the in-memory activities database between tests."""
     yield
-    # Cleanup after test
+    # Cleanup after test: restore original state for the next test
     _activities_store.clear()
     _activities_store.update(copy.deepcopy(_original_activities))
 
