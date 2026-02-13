@@ -114,6 +114,23 @@ class TestSignup:
         assert response.status_code == 404
         assert "not found" in response.json()["detail"].lower()
 
+    def test_signup_invalid_email_format(self, client):
+        """Test that signup rejects invalid email formats"""
+        invalid_emails = [
+            "notanemail",
+            "missing@domain",
+            "@nodomain.com",
+            "no-at-sign.com",
+            "spaces in@email.com",
+            "double@@domain.com"
+        ]
+        for invalid_email in invalid_emails:
+            response = client.post(
+                f"/activities/Soccer Team/signup?email={invalid_email}"
+            )
+            assert response.status_code == 400
+            assert "invalid email" in response.json()["detail"].lower()
+
     def test_signup_rejected_when_activity_full(self, client):
         # Fetch current activity state to determine capacity and current participants
         get_response = client.get("/activities")
@@ -171,6 +188,23 @@ class TestUnregister:
         )
         assert response.status_code == 404
         assert "not found" in response.json()["detail"].lower()
+
+    def test_unregister_invalid_email_format(self, client):
+        """Test that unregister rejects invalid email formats"""
+        invalid_emails = [
+            "notanemail",
+            "missing@domain",
+            "@nodomain.com",
+            "no-at-sign.com",
+            "spaces in@email.com",
+            "double@@domain.com"
+        ]
+        for invalid_email in invalid_emails:
+            response = client.delete(
+                f"/activities/Soccer Team/unregister?email={invalid_email}"
+            )
+            assert response.status_code == 400
+            assert "invalid email" in response.json()["detail"].lower()
 
 
 # ──────────────────────────────────────────────
