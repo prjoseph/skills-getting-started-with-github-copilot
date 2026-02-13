@@ -20,25 +20,53 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const spotsLeft = details.max_participants - details.participants.length;
 
-        const participantsList = details.participants
-          .map((email) => `<li><span class="participant-email">${email}</span><button class="remove-btn" data-activity="${name}" data-email="${email}" title="Remove ${email}" aria-label="Remove ${email} from ${name}">&#x2715;</button></li>`)
-          .join("");
-
         activityCard.innerHTML = `
           <h4>${name}</h4>
           <p>${details.description}</p>
           <p><strong>Schedule:</strong> ${details.schedule}</p>
           <p><strong>Availability:</strong> ${spotsLeft} spots left</p>
-          <div class="participants-section">
-            <strong>Enrolled Students:</strong>
-            ${
-              details.participants.length > 0
-                ? `<ul class="participants-list">${participantsList}</ul>`
-                : `<p class="no-participants">No participants yet — be the first to join!</p>`
-            }
-          </div>
+          <div class="participants-section"></div>
         `;
 
+        // Safely populate participants section without injecting raw HTML
+        const participantsSection = activityCard.querySelector(".participants-section");
+        participantsSection.innerHTML = "";
+
+        const participantsTitle = document.createElement("strong");
+        participantsTitle.textContent = "Enrolled Students:";
+        participantsSection.appendChild(participantsTitle);
+
+        if (details.participants.length > 0) {
+          const ul = document.createElement("ul");
+          ul.className = "participants-list";
+
+          details.participants.forEach((email) => {
+            const li = document.createElement("li");
+
+            const span = document.createElement("span");
+            span.className = "participant-email";
+            span.textContent = email;
+
+            const button = document.createElement("button");
+            button.className = "remove-btn";
+            button.type = "button";
+            button.dataset.activity = name;
+            button.dataset.email = email;
+            button.title = `Remove ${email}`;
+            button.textContent = "✕";
+
+            li.appendChild(span);
+            li.appendChild(button);
+            ul.appendChild(li);
+          });
+
+          participantsSection.appendChild(ul);
+        } else {
+          const noParticipants = document.createElement("p");
+          noParticipants.className = "no-participants";
+          noParticipants.textContent = "No participants yet — be the first to join!";
+          participantsSection.appendChild(noParticipants);
+        }
         // Add click handlers for remove buttons
         activityCard.querySelectorAll(".remove-btn").forEach((btn) => {
           btn.addEventListener("click", async () => {
