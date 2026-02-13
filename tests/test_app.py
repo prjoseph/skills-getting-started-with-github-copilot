@@ -5,22 +5,36 @@ Tests for the Mergington High School Activities API.
 import copy
 import pytest
 from fastapi.testclient import TestClient
-from src.app import app, activities
+from src.app import app
 
+
+def _get_activities_store():
+    """
+    Helper to access the underlying activities store.
+
+    This indirection keeps tests resilient to changes in how the
+    application stores activities (e.g., switching from an in-memory
+    dict to another mechanism).
+    """
+    from src.app import activities  # Local import to avoid hard coupling at module level
+    return activities
+
+
+_activities_store = _get_activities_store()
 # Store original activities for resetting between tests
-_original_activities = copy.deepcopy(activities)
+_original_activities = copy.deepcopy(_activities_store)
 
 
 @pytest.fixture(autouse=True)
 def reset_activities():
     """Reset the in-memory activities database before each test."""
     # Restore original state
-    activities.clear()
-    activities.update(copy.deepcopy(_original_activities))
+    _activities_store.clear()
+    _activities_store.update(copy.deepcopy(_original_activities))
     yield
     # Cleanup after test
-    activities.clear()
-    activities.update(copy.deepcopy(_original_activities))
+    _activities_store.clear()
+    _activities_store.update(copy.deepcopy(_original_activities))
 
 
 @pytest.fixture
