@@ -122,6 +122,11 @@ section h3 {
   color: #b71c1c;
 }
 
+.remove-btn:focus-visible {
+  outline: 2px solid #c62828;
+  outline-offset: 2px;
+  background-color: #ffcdd2;
+}
 .no-participants {
   font-style: italic;
   color: #999;
