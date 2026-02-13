@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const spotsLeft = details.max_participants - details.participants.length;
 
         const participantsList = details.participants
-          .map((email) => `<li>${email}</li>`)
+          .map((email) => `<li><span class="participant-email">${email}</span><button class="remove-btn" data-activity="${name}" data-email="${email}" title="Remove ${email}">&#x2715;</button></li>`)
           .join("");
 
         activityCard.innerHTML = `
@@ -38,6 +38,37 @@ document.addEventListener("DOMContentLoaded", () => {
             }
           </div>
         `;
+
+        // Add click handlers for remove buttons
+        activityCard.querySelectorAll(".remove-btn").forEach((btn) => {
+          btn.addEventListener("click", async () => {
+            const activityName = btn.dataset.activity;
+            const email = btn.dataset.email;
+            try {
+              const res = await fetch(
+                `/activities/${encodeURIComponent(activityName)}/unregister?email=${encodeURIComponent(email)}`,
+                { method: "DELETE" }
+              );
+              const result = await res.json();
+              if (res.ok) {
+                messageDiv.textContent = result.message;
+                messageDiv.className = "success";
+              } else {
+                messageDiv.textContent = result.detail || "An error occurred";
+                messageDiv.className = "error";
+              }
+              messageDiv.classList.remove("hidden");
+              setTimeout(() => messageDiv.classList.add("hidden"), 5000);
+              // Refresh the activities list
+              fetchActivities();
+            } catch (error) {
+              messageDiv.textContent = "Failed to unregister. Please try again.";
+              messageDiv.className = "error";
+              messageDiv.classList.remove("hidden");
+              console.error("Error unregistering:", error);
+            }
+          });
+        });
 
         activitiesList.appendChild(activityCard);
 

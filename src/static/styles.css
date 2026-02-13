@@ -92,10 +92,34 @@ section h3 {
 .participants-list li {
   background-color: #e3f2fd;
   color: #1a237e;
-  padding: 4px 12px;
+  padding: 4px 8px 4px 12px;
   border-radius: 16px;
   font-size: 13px;
   border: 1px solid #bbdefb;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.participant-email {
+  line-height: 1;
+}
+
+.remove-btn {
+  background: none;
+  border: none;
+  color: #c62828;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 2px 4px;
+  border-radius: 50%;
+  line-height: 1;
+  transition: background-color 0.2s;
+}
+
+.remove-btn:hover {
+  background-color: #ffcdd2;
+  color: #b71c1c;
 }
 
 .no-participants {
